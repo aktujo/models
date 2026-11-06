@@ -1,0 +1,8 @@
+aktujo-extract-latin
+Copyright the aktujo contributors – the Rust code around the model.
+
+The model (rec.onnx, dict.txt): PP-OCRv5 Latin text recognition and its dictionary of PaddleOCR,
+Copyright the PaddlePaddle Authors, licensed under the Apache License, Version 2.0;
+converted to ONNX by monkt.com, published under the Apache License, Version 2.0, at
+https://huggingface.co/monkt/paddleocr-onnx (commit 7b02d0a30a07ba2b92ad1ff5a8941ae2c633de65,
+languages/latin/rec.onnx and languages/latin/dict.txt). The files are unchanged; SHA256SUMS holds their hashes.

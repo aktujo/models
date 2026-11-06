@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+# The models aktujo builds in, one crate per model. Each crate has a version of its own and is published from a tag
+# `<crate>-v<version>` (.github/workflows/ci.yml): a model is uploaded again only when it changes.
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.85"
+license = "Apache-2.0"
+repository = "https://github.com/aktujo/models"
+homepage = "https://aktujo.dev"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"

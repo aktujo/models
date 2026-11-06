@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Licence and copyright of files that cannot carry a header (REUSE specification 3.3). Code and configuration name
+# their own licence in an SPDX header.
+version = 1
+
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "falkOSS – Falcon Lake Open Source Software gUG (haftungsbeschränkt) i. G. and the aktujo contributors"
+
+[[annotations]]
+path = ["**/*.md", "**/NOTICE", "**/SHA256SUMS", "**/.gitignore", "Cargo.lock"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "falkOSS – Falcon Lake Open Source Software gUG (haftungsbeschränkt) i. G. and the aktujo contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+# The models: PaddleOCR's, converted to ONNX by monkt.com (NOTICE).
+[[annotations]]
+path = ["**/*.onnx", "**/dict.txt"]
+precedence = "override"
+SPDX-FileCopyrightText = "PaddlePaddle Authors"
+SPDX-License-Identifier = "Apache-2.0"

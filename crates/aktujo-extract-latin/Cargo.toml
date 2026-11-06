@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "aktujo-extract-latin"
+description = "The model with which aktujo reads Latin script: PP-OCRv5 Latin text recognition as ONNX, with its dictionary"
+version = "1.0.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+keywords = ["aktujo", "ocr", "onnx", "text-recognition", "model"]
+categories = ["computer-vision"]
+include = ["src/**/*.rs", "rec.onnx", "dict.txt", "SHA256SUMS", "README.md", "NOTICE", "LICENSE"]
+
+[lints]
+workspace = true

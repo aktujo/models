@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: Apache-2.0
+# Format, lints and tests; each crate packed and under crates.io's 10 MiB; the hashes in SHA256SUMS. The licence check
+# (REUSE) and a sign-off (DCO) on every commit of a pull request come from falkoss/starterpack, pinned by commit. A tag
+# `<crate>-v<version>` on main publishes that crate (job `crates`). Actions are pinned by commit, with the version as
+# a comment.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["aktujo-*-v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup toolchain install stable --profile minimal --component rustfmt,clippy
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets --locked
+      - run: cargo test --workspace --locked
+      - name: The hashes in SHA256SUMS
+        run: for d in crates/*/; do (cd "$d" && sha256sum -c SHA256SUMS); done
+      - name: Each crate packed, under 10 MiB
+        run: |
+          cargo package --workspace --locked
+          for f in target/package/*.crate; do
+            size=$(stat -c %s "$f"); echo "$f: $size bytes"
+            test "$size" -le 10485760 || { echo "::error::$f is larger than 10 MiB"; exit 1; }
+          done
+
+  licences:
+    uses: falkoss/starterpack/.github/workflows/reuse.yml@8fba58423b0b95131b436cb2edcb91adad742d71
+  sign-off:
+    uses: falkoss/starterpack/.github/workflows/dco.yml@8fba58423b0b95131b436cb2edcb91adad742d71
+
+  # From a tag `<crate>-v<version>` on main, once the checks passed: that crate to crates.io by Trusted Publishing (no
+  # token; the environment `crates-io` asks the maintainer to approve). A crate's first version is published by hand.
+  crates:
+    needs: [rust, licences]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    environment: crates-io
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - run: rustup toolchain install stable --profile minimal
+      - name: The tag is on main and names a crate and its version
+        id: crate
+        run: |
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main \
+            || { echo "::error::$GITHUB_REF_NAME is not on main: release a commit of main"; exit 1; }
+          name="${GITHUB_REF_NAME%-v*}"; tagged="${GITHUB_REF_NAME##*-v}"
+          version=$(cargo metadata --no-deps --format-version 1 | jq -r --arg n "$name" '.packages[] | select(.name == $n) | .version')
+          test -n "$version" || { echo "::error::no crate $name"; exit 1; }
+          test "$version" = "$tagged" || { echo "::error::$name is $version, the tag $GITHUB_REF_NAME"; exit 1; }
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+      - uses: rust-lang/crates-io-auth-action@c6f97d42243bad5fab37ca0427f495c86d5b1a18 # v1.0.5
+        id: auth
+      - name: Publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: cargo publish --locked -p "${{ steps.crate.outputs.name }}"

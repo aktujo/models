@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "aktujo-extract-det"
+description = "The model with which aktujo finds where text stands on a page: PP-OCRv3 text detection as ONNX"
+version = "1.0.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "README.md"
+keywords = ["aktujo", "ocr", "onnx", "text-detection", "model"]
+categories = ["computer-vision"]
+include = ["src/**/*.rs", "det.onnx", "SHA256SUMS", "README.md", "NOTICE", "LICENSE"]
+
+[lints]
+workspace = true
